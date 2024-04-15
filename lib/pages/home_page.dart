@@ -6,6 +6,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
 
+import '../widget/location.dart';
 import '../widget/search.dart';
 
 class HomePage extends StatefulWidget {
@@ -17,24 +18,7 @@ class _HomePageState extends State<HomePage> {
   Weather? _weather;
   String _currentLocation = "Delhi";
   String _searchedLocation = "";
-  List<String> _extraLocations = [
-    'New York',
-    'Paris',
-    'Tokyo',
-    'Sydney',
-    'London',
-    'Los Angeles',
-    'Berlin',
-    'Beijing',
-    'Moscow',
-    'Rio de Janeiro',
-    'Mumbai',
-    'Rome',
-    'Cairo',
-    'Toronto',
-    'Dubai',
-    'Singapore',
-  ];
+  final List<String> _extraLocations = CityData.cities;
   String? _selectedCity;
 
   @override
