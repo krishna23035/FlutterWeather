@@ -1,60 +1,59 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-
-import './provider/weatherProvider.dart';
-import 'screens/homeScreen.dart';
-import 'screens/sevenDayForecastDetailScreen.dart';
+import 'package:flutter_weather/pages/home_page.dart';
+import 'package:geolocator/geolocator.dart';
 
 void main() {
-  runApp(
-    MyApp(),
-  );
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (context) => WeatherProvider(),
-      child: MaterialApp(
-        title: 'Flutter Weather',
-        debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-          appBarTheme: AppBarTheme(
-            backgroundColor: Colors.white,
-            iconTheme: IconThemeData(color: Colors.blue),
-            elevation: 0,
-          ),
-          scaffoldBackgroundColor: Colors.white,
-          primaryColor: Colors.blue,
-          visualDensity: VisualDensity.adaptivePlatformDensity,
-          colorScheme:
-              ColorScheme.fromSwatch().copyWith(secondary: Colors.white),
-        ),
-        home: HomeScreen(),
-        // routes: {
-        //   WeeklyScreen.routeName: (ctx) => WeeklyScreen(),
-        // },
-        onGenerateRoute: (settings) {
-          final arguments = settings.arguments;
-          if (settings.name == SevenDayForecastDetail.routeName) {
-            return PageRouteBuilder(
-              settings: settings,
-              pageBuilder: (_, __, ___) => SevenDayForecastDetail(
-                initialIndex: arguments == null ? 0 : arguments as int,
-              ),
-              transitionsBuilder: (ctx, a, b, c) => CupertinoPageTransition(
-                primaryRouteAnimation: a,
-                secondaryRouteAnimation: b,
-                linearTransition: false,
-                child: c,
-              ),
-            );
-          }
-          // Unknown route
-          return MaterialPageRoute(builder: (_) => HomeScreen());
-        },
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: PermissionHandler(),
+    );
+  }
+}
+
+class PermissionHandler extends StatefulWidget {
+  @override
+  _PermissionHandlerState createState() => _PermissionHandlerState();
+}
+
+class _PermissionHandlerState extends State<PermissionHandler> {
+  @override
+  void initState() {
+    super.initState();
+    _requestLocationPermission();
+  }
+
+  Future<void> _requestLocationPermission() async {
+    LocationPermission permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        // Handle the scenario when user denies location permission
+        // You may want to display a message or prompt the user to grant permission manually
+      }
+    }
+    if (permission == LocationPermission.deniedForever) {
+      // Handle the scenario when user denies location permission permanently
+      // You may want to display a message or prompt the user to grant permission manually from device settings
+    }
+    // If permission is granted or already granted, navigate to the home page
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => HomePage()),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Center(
+        child: CircularProgressIndicator(),
       ),
     );
   }
