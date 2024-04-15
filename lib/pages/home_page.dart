@@ -6,6 +6,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
 
+import '../widget/search.dart';
+
 class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
@@ -14,6 +16,7 @@ class _HomePageState extends State<HomePage> {
   final WeatherFactory _wf = WeatherFactory(OPENWEATHER_API_KEY);
   Weather? _weather;
   String _currentLocation = "Delhi";
+  String _searchedLocation = "";
   List<String> _extraLocations = [
     'New York',
     'Paris',
@@ -32,6 +35,7 @@ class _HomePageState extends State<HomePage> {
     'Dubai',
     'Singapore',
   ];
+  String? _selectedCity;
 
   @override
   void initState() {
@@ -42,12 +46,32 @@ class _HomePageState extends State<HomePage> {
         _weather = w;
       });
     });
+    _getWeatherData(_currentLocation);
     _getCurrentLocation();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: Text('Weather App'),
+        actions: [
+          IconButton(
+              icon: Icon(Icons.search),
+              onPressed: () async {
+                String? selectedCity = await showSearch<String>(
+                  context: context,
+                  delegate: CitySearchDelegate(_extraLocations),
+                );
+                if (selectedCity != null) {
+                  setState(() {
+                    _selectedCity = selectedCity;
+                  });
+                  _getWeatherData(selectedCity);
+                }
+              }),
+        ],
+      ),
       body: Column(
         children: [
           Expanded(
@@ -73,7 +97,8 @@ class _HomePageState extends State<HomePage> {
     return GestureDetector(
       onTap: () {
         setState(() {
-          _currentLocation = location;
+          _selectedCity = location;
+          // _currentLocation = location;
         });
         _getWeatherData(location);
       },
@@ -85,7 +110,7 @@ class _HomePageState extends State<HomePage> {
             Text(
               location,
               style: TextStyle(
-                color: location == _currentLocation ? Colors.red : Colors.white,
+                color: location == _selectedCity ? Colors.red : Colors.white,
                 fontSize: 20.0,
                 fontWeight: FontWeight.bold,
               ),
@@ -170,6 +195,8 @@ class _HomePageState extends State<HomePage> {
     _wf.currentWeatherByCityName(location).then((w) {
       setState(() {
         _weather = w;
+        //   _currentLocation = location;
+        _searchedLocation = location;
       });
     });
   }
@@ -207,15 +234,14 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _locationHeader() {
-    String locationName = _currentLocation;
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: Row(
         children: [
           SizedBox(width: 20.0),
-          _buildLocationItem(_currentLocation),
-          SizedBox(width: 20.0),
-          for (String location in _extraLocations) _buildLocationItem(location),
+          if (_selectedCity != null)
+            _buildLocationItem(
+                _selectedCity!), // Display only the selected city
         ],
       ),
     );
