@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_weather/const.dart';
 import 'package:intl/intl.dart';
 import 'package:weather/weather.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
-
+import 'package:share_plus/share_plus.dart';
 import '../widget/location.dart';
 import '../widget/search.dart';
 
@@ -20,6 +21,7 @@ class _HomePageState extends State<HomePage> {
   String _searchedLocation = "";
   final List<String> _extraLocations = CityData.cities;
   String? _selectedCity;
+  ThemeMode _themeMode = ThemeMode.light;
 
   @override
   void initState() {
@@ -36,11 +38,40 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Weather App'),
-        actions: [
-          IconButton(
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData.light(),
+      darkTheme: ThemeData.dark(),
+      themeMode: _themeMode,
+      home: Scaffold(
+        appBar: AppBar(
+          title: Text('Weather App'),
+          leading: PopupMenuButton<String>(
+            onSelected: (String value) {
+              if (value == 'share') {
+                _shareWeatherData();
+              } else if (value == 'theme') {
+                setState(() {
+                  // Toggle between light and dark themes
+                  _themeMode = _themeMode == ThemeMode.light
+                      ? ThemeMode.dark
+                      : ThemeMode.light;
+                });
+              }
+            },
+            itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+              const PopupMenuItem<String>(
+                value: 'share',
+                child: Text('Share'),
+              ),
+              const PopupMenuItem<String>(
+                value: 'theme',
+                child: Text('Change Theme'),
+              ),
+            ],
+          ),
+          actions: [
+            IconButton(
               icon: Icon(Icons.search),
               onPressed: () async {
                 String? selectedCity = await showSearch<String>(
@@ -53,26 +84,28 @@ class _HomePageState extends State<HomePage> {
                   });
                   _getWeatherData(selectedCity);
                 }
-              }),
-        ],
-      ),
-      body: Column(
-        children: [
-          Expanded(
-            child: _buildUI(),
-          ),
-          Container(
-            height: 220,
-            color: Colors.purple,
-            child: ListView.builder(
-              scrollDirection: Axis.horizontal,
-              itemCount: _extraLocations.length,
-              itemBuilder: (context, index) {
-                return _buildLocationItem(_extraLocations[index]);
               },
             ),
-          ),
-        ],
+          ],
+        ),
+        body: Column(
+          children: [
+            Expanded(
+              child: _buildUI(),
+            ),
+            Container(
+              height: 220,
+              color: Colors.purple,
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                itemCount: _extraLocations.length,
+                itemBuilder: (context, index) {
+                  return _buildLocationItem(_extraLocations[index]);
+                },
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -320,6 +353,15 @@ class _HomePageState extends State<HomePage> {
         ),
       ],
     );
+  }
+
+  void _shareWeatherData() {
+    if (_weather != null) {
+      String temperature =
+          "${_weather?.temperature?.celsius?.toStringAsFixed(0)}°C";
+      String weatherData = "Current Temperature: $temperature";
+      Share.share(weatherData);
+    }
   }
 
   Widget _extraInfo() {

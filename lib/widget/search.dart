@@ -56,7 +56,7 @@ class CitySearchDelegate extends SearchDelegate<String> {
 
   Widget _buildSearchResults() {
     final List<String> searchResults = cities
-        .where((city) => city.toLowerCase().contains(query.toLowerCase()))
+        .where((city) => city.toLowerCase().startsWith(query.toLowerCase()))
         .toList();
 
     return ListView.builder(
@@ -66,8 +66,6 @@ class CitySearchDelegate extends SearchDelegate<String> {
         return ListTile(
           title: Text(result),
           onTap: () {
-            // Handle what happens when a search result is tapped.
-            // For example, close the search and return the selected result.
             close(context, result);
           },
         );
