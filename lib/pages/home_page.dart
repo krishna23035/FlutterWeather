@@ -10,6 +10,7 @@ import 'package:geocoding/geocoding.dart';
 import 'package:share_plus/share_plus.dart';
 import '../widget/location.dart';
 import '../widget/search.dart';
+import 'SettingPage.dart';
 
 class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
@@ -89,14 +90,21 @@ class _HomePageState extends State<HomePage> {
                 }
               },
             ),
+            IconButton(
+              icon: Icon(Icons.settings),
+              onPressed: () {
+                // Open settings page to toggle theme manually
+                _openSettings();
+              },
+            ),
           ],
         ),
         body: Column(
           children: [
             CurrentLocationWeatherWidget(
-              location: _currentLocation,
-              temperature: _currentLocationWeather,
-            ),
+                //  location: _currentLocation,
+                //     temperature: _currentLocationWeather,
+                ),
             Expanded(
               child: _buildUI(),
             ),
@@ -406,5 +414,19 @@ class _HomePageState extends State<HomePage> {
         // ),
       ],
     );
+  }
+
+  void _openSettings() {
+    // Implement a settings page where the user can manually toggle the theme
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => SettingsPage()),
+    ).then((themeMode) {
+      if (themeMode != null) {
+        setState(() {
+          _themeMode = themeMode;
+        });
+      }
+    });
   }
 }
