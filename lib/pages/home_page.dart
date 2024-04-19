@@ -101,10 +101,19 @@ class _HomePageState extends State<HomePage> {
         ),
         body: Column(
           children: [
-            CurrentLocationWeatherWidget(
-                //  location: _currentLocation,
-                //     temperature: _currentLocationWeather,
-                ),
+            SizedBox(
+              height: 20,
+            ),
+            Container(
+              height: 150,
+              child: CurrentLocationWeatherWidget(
+                  //  location: _currentLocation,
+                  //     temperature: _currentLocationWeather,
+                  ),
+            ),
+            // SizedBox(
+            //   height: 20,
+            // ),
             Expanded(
               child: _buildUI(),
             ),
