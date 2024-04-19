@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_weather/const.dart';
+import 'package:flutter_weather/widget/currentLocationWeather.dart';
 import 'package:intl/intl.dart';
 import 'package:weather/weather.dart';
 import 'package:flutter/cupertino.dart';
@@ -22,9 +23,11 @@ class _HomePageState extends State<HomePage> {
   final List<String> _extraLocations = CityData.cities;
   String? _selectedCity;
   ThemeMode _themeMode = ThemeMode.light;
+  String _currentLocationWeather = "";
 
   @override
   void initState() {
+    //change image and image pick ,done screen as 2nd screen,forn
     super.initState();
 
     _wf.currentWeatherByCityName(_currentLocation).then((w) {
@@ -90,6 +93,10 @@ class _HomePageState extends State<HomePage> {
         ),
         body: Column(
           children: [
+            CurrentLocationWeatherWidget(
+              location: _currentLocation,
+              temperature: _currentLocationWeather,
+            ),
             Expanded(
               child: _buildUI(),
             ),
@@ -115,6 +122,14 @@ class _HomePageState extends State<HomePage> {
       onTap: () {
         setState(() {
           _selectedCity = location;
+          if (_currentLocation == location && _selectedCity == null) {
+            _getWeatherData(_currentLocation);
+          } else {
+            // Otherwise, show weather for the tapped location
+            _getWeatherData(location);
+          }
+
+          //  print("$_currentLocation");
           // _currentLocation = location;
         });
         _getWeatherData(location);
@@ -202,7 +217,14 @@ class _HomePageState extends State<HomePage> {
       position.latitude,
       position.longitude,
     );
+    String currentLocation = placemarks[0].locality ?? "Unknown";
+    Weather? weather = await _wf.currentWeatherByLocation(
+      position.latitude,
+      position.longitude,
+    );
+
     setState(() {
+      _currentLocation = currentLocation; //add this
       _currentLocation = placemarks[0].locality ?? "Unknown";
     });
     _getWeatherData(_currentLocation);
