@@ -31,6 +31,11 @@ dependencies:
   shared_preferences: ^2.2.3
   sqflite: ^2.3.3
   weather: ^3.1.1
+  firebase_core: ^2.30.0
+  firebase_auth: ^4.19.2
+  app_settings: ^5.1.1
+  firebase_messaging: ^14.8.2
+  flutter_local_notifications: ^17.0.1
 
   
 

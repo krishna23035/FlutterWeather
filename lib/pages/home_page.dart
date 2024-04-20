@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_weather/Services/notification_services.dart';
 import 'package:flutter_weather/const.dart';
 import 'package:flutter_weather/widget/currentLocationWeather.dart';
 import 'package:intl/intl.dart';
@@ -17,6 +18,8 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  NotificationServices notificationServices = NotificationServices();
+
   final WeatherFactory _wf = WeatherFactory(OPENWEATHER_API_KEY);
   Weather? _weather;
   String _currentLocation = "Delhi";
@@ -28,6 +31,7 @@ class _HomePageState extends State<HomePage> {
 
   @override
   void initState() {
+    notificationServices.requestNotificationPermission();
     //change image and image pick ,done screen as 2nd screen,forn
     super.initState();
 
@@ -118,7 +122,7 @@ class _HomePageState extends State<HomePage> {
               child: _buildUI(),
             ),
             Container(
-              height: 220,
+              height: 150,
               color: Colors.purple,
               child: ListView.builder(
                 scrollDirection: Axis.horizontal,
