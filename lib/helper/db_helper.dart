@@ -33,6 +33,16 @@ class LocationDatabase {
         name TEXT NOT NULL
       )
     ''');
+
+    await db.execute('''
+      CREATE TABLE weather(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        location_id INTEGER,
+        temperature REAL NOT NULL,
+        timestamp INTEGER NOT NULL
+        FOREIGN KEY (location_id) REFERENCES location(id)
+      )
+    ''');
   }
 
   Future<int> insertLocation(String name) async {
@@ -47,6 +57,27 @@ class LocationDatabase {
     final List<Map<String, dynamic>> maps = await db.query('locations');
 
     return List.generate(maps.length, (i) => maps[i]['name'] as String);
+  }
+
+  Future<int> insertWeather(String locationId, double temperature) async {
+    final db = await instance.database;
+    final timestamp = DateTime.now().millisecondsSinceEpoch;
+
+    return await db.insert('weather', {
+      'location_id': locationId,
+      'temperature': temperature,
+      'timestamp': timestamp,
+    });
+  }
+
+  Future<List<Map<String, dynamic>>> getWeather(int locationId) async {
+    final db = await instance.database;
+
+    return await db.query(
+      'weather',
+      where: 'location_id = ?',
+      whereArgs: [locationId],
+    );
   }
 
   Future<void> deleteLocation(String name) async {

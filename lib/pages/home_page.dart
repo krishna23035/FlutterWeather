@@ -9,9 +9,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:share_plus/share_plus.dart';
+import '../helper/db_helper.dart';
+import '../setting/SettingPage.dart';
 import '../widget/location.dart';
 import '../widget/search.dart';
-import 'SettingPage.dart';
 
 class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
@@ -238,7 +239,7 @@ class _HomePageState extends State<HomePage> {
       position.latitude,
       position.longitude,
     );
-    String currentLocation = placemarks[0].locality ?? "Unknown";
+    String currentLocation = placemarks[0].locality ?? "Delhi";
     Weather? weather = await _wf.currentWeatherByLocation(
       position.latitude,
       position.longitude,
@@ -246,18 +247,35 @@ class _HomePageState extends State<HomePage> {
 
     setState(() {
       _currentLocation = currentLocation; //add this
-      _currentLocation = placemarks[0].locality ?? "Unknown";
+      _currentLocation = placemarks[0].locality ?? "35.77";
     });
     _getWeatherData(_currentLocation);
+  }
+
+  Future<void> _saveWeatherToDatabase(String location, Weather weather) async {
+    try {
+      // Initialize your LocationDatabase
+      final database = LocationDatabase.instance;
+
+      final temperature = weather.temperature?.celsius?.toInt() ?? 0;
+      // Insert weather data into the database
+      await database.insertWeather(
+          location,
+          weather.temperature?.celsius ??
+              0); // Use 'location' parameter instead of '_currentLocation'
+    } catch (e) {
+      print('Error saving weather data: $e');
+    }
   }
 
   void _getWeatherData(String location) {
     _wf.currentWeatherByCityName(location).then((w) {
       setState(() {
         _weather = w;
-        //   _currentLocation = location;
         _searchedLocation = location;
       });
+
+      _saveWeatherToDatabase(location, w); // Pass the location parameter
     });
   }
 

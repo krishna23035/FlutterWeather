@@ -36,6 +36,9 @@ dependencies:
   app_settings: ^5.1.1
   firebase_messaging: ^14.8.2
   flutter_local_notifications: ^17.0.1
+  flutter_timezone: ^1.0.8
+  rxdart: ^0.27.7
+  connectivity_plus: ^6.0.2
 
   
 
